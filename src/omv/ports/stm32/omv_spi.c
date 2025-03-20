@@ -92,6 +92,15 @@ DEFINE_SPI_INSTANCE(6)
         { OMV_SPI##spi_number##_DMA_RX_CHANNEL, { OMV_SPI##spi_number##_DMA_RX_REQUEST } }; \
     } while (0)
 
+#define INITIALIZE_SPI6_DESCR(spi, spi_number)                                              \
+    do {                                                                                    \
+        (spi)->id = spi_number;                                                             \
+        (spi)->irqn = SPI##spi_number##_IRQn;                                               \
+        (spi)->cs = OMV_SPI##spi_number##_SSEL_PIN;                                         \
+        (spi)->descr = &SPIHandle##spi_number;                                              \
+        (spi)->descr->Instance = SPI##spi_number;                                           \
+    } while (0)
+
 static omv_spi_t *omv_spi_descr_all[6] = { NULL };
 
 static uint32_t omv_spi_clocksource(SPI_TypeDef *spi) {
@@ -370,6 +379,61 @@ static int omv_spi_bus_init(omv_spi_t *spi, omv_spi_config_t *config) {
     return 0;
 }
 
+static int omv_spi6_bus_init(omv_spi_t *spi, omv_spi_config_t *config) {
+    SPI_HandleTypeDef *spi_descr = spi->descr;
+
+    __HAL_RCC_SPI6_CLK_ENABLE();
+
+    spi_descr->Init.Mode = config->spi_mode;// SPI工作模式（主/从）
+    spi_descr->Init.TIMode = SPI_TIMODE_DISABLE;
+    spi_descr->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;// 禁用CRC校验
+    spi_descr->Init.NSS =  SPI_NSS_SOFT;
+    spi_descr->Init.DataSize = (config->datasize == 8) ? SPI_DATASIZE_8BIT : SPI_DATASIZE_16BIT;// 数据位宽（8/16位）
+    spi_descr->Init.FirstBit = config->bit_order;// 数据传输顺序（MSB/LSB优先）
+    spi_descr->Init.CLKPhase = config->clk_pha;// 时钟相位（CPHA）
+    spi_descr->Init.CLKPolarity = config->clk_pol;// 时钟极性（CPOL）
+    spi_descr->Init.BaudRatePrescaler = omv_spi_prescaler(spi_descr->Instance, config->baudrate);// 波特率预分频（决定SCK频率）
+    
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.Pull      = GPIO_NOPULL;
+    GPIO_InitStructure.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStructure.Speed     = GPIO_SPEED_FREQ_MEDIUM;
+
+    GPIO_InitStructure.Alternate = GPIO_AF5_SPI6;
+    GPIO_InitStructure.Pin       = GPIO_PIN_14;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStructure);
+
+    GPIO_InitStructure.Alternate = GPIO_AF5_SPI6;
+    GPIO_InitStructure.Pin       = GPIO_PIN_13;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStructure);
+
+    GPIO_InitStructure.Mode      = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStructure.Speed     = GPIO_SPEED_FREQ_LOW;
+
+    GPIO_InitStructure.Pin       = GPIO_PIN_11;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.Pin       = GPIO_PIN_9;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStructure);
+
+    GPIO_InitStructure.Pin       = GPIO_PIN_3;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    // Configure bus direction.总线方向配置
+    spi_descr->Init.Direction = SPI_DIRECTION_1LINE;// 单线模式（仅主发）
+
+
+    if (HAL_SPI_Init(spi_descr) != HAL_OK) {
+        HAL_SPI_DeInit(spi_descr);
+        printf("OSError: HAL_SPI_Init failed\n");
+        return -1;
+    }
+    return 0;
+
+    NVIC_SetPriority(SPI6_IRQn, IRQ_PRI_SPI);
+    HAL_NVIC_EnableIRQ(SPI6_IRQn);
+}
+
 int omv_spi_init(omv_spi_t *spi, omv_spi_config_t *config) {
     memset(spi, 0, sizeof(omv_spi_t));
 
@@ -396,13 +460,19 @@ int omv_spi_init(omv_spi_t *spi, omv_spi_config_t *config) {
     #endif
     #if defined(OMV_SPI6_ID)
     } else if (config->id == 6) {
-        INITIALIZE_SPI_DESCR(spi, 6);
+        INITIALIZE_SPI6_DESCR(spi, 6);
     #endif
     } else {
         return -1;
     }
 
-    if (omv_spi_bus_init(spi, config) != 0) {
+    if(config->id == 6) {
+        if (omv_spi6_bus_init(spi, config) != 0) {
+            return -1;
+        }
+        config->dma_flags = 0;
+    }
+    else if (omv_spi_bus_init(spi, config) != 0) {
         return -1;
     }
 

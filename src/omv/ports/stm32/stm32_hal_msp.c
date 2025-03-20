@@ -238,7 +238,7 @@ void HAL_MspInit(void) {
     #endif
 
     #if defined(OMV_CSI_RESET_PIN)
-    omv_gpio_config(OMV_CSI_RESET_PIN, OMV_GPIO_MODE_OUTPUT, OMV_GPIO_PULL_DOWN, OMV_GPIO_SPEED_LOW, -1);
+    omv_gpio_config(OMV_CSI_RESET_PIN, OMV_GPIO_MODE_OUTPUT_OD, OMV_GPIO_PULL_DOWN, OMV_GPIO_SPEED_LOW, -1);
     #endif
     #if defined(OMV_CSI_FSYNC_PIN)
     omv_gpio_config(OMV_CSI_FSYNC_PIN, OMV_GPIO_MODE_OUTPUT, OMV_GPIO_PULL_DOWN, OMV_GPIO_SPEED_LOW, -1);

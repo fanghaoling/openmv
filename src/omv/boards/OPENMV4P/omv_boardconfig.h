@@ -273,18 +273,39 @@
 
 // SPI bus 6
 // TODO: BDMA is Not currently supported by this driver.
+// 偷懒了，如果有更好的方法可以和我说
+#define OMV_SPI_LCD_CONTROLLER              (&spi_obj[5])
+#define OMV_SPI6_ID                           (6)
+#define OMV_SPI6_SCLK_PIN                     (&omv_pin_G13_SPI6)
+#define OMV_SPI6_MISO_PIN                     (&omv_pin_G12_SPI6)
+#define OMV_SPI6_MOSI_PIN                     (&omv_pin_G14_SPI6)
+#define OMV_SPI6_SSEL_PIN                     (&omv_pin_C3_GPIO)
+// #define OMV_SPI6_DMA_TX_CHANNEL               (DMA2_Stream5)
+// #define OMV_SPI6_DMA_TX_REQUEST               (BDMA_REQUEST_SPI6_TX)
+// #define OMV_SPI6_DMA_RX_CHANNEL               (DMA2_Stream6)
+// #define OMV_SPI6_DMA_RX_REQUEST               (BDMA_REQUEST_SPI6_RX)
 
 // SPI LCD Interface
-#define OMV_SPI_DISPLAY_CONTROLLER            (OMV_SPI2_ID)
-#define OMV_SPI_DISPLAY_MOSI_PIN              (&omv_pin_B15_SPI2)
-#define OMV_SPI_DISPLAY_MISO_PIN              (&omv_pin_B14_SPI2)
-#define OMV_SPI_DISPLAY_SCLK_PIN              (&omv_pin_B13_SPI2)
-#define OMV_SPI_DISPLAY_SSEL_PIN              (&omv_pin_B12_GPIO)
+// #define OMV_SPI_DISPLAY_CONTROLLER            (OMV_SPI2_ID)
+// #define OMV_SPI_DISPLAY_MOSI_PIN              (&omv_pin_B15_SPI6)
+// #define OMV_SPI_DISPLAY_MISO_PIN              (&omv_pin_B14_SPI6)
+// #define OMV_SPI_DISPLAY_SCLK_PIN              (&omv_pin_B13_SPI6)
+// #define OMV_SPI_DISPLAY_SSEL_PIN              (&omv_pin_B12_GPIO)
 
-#define OMV_SPI_DISPLAY_RS_PIN                (&omv_pin_D13_GPIO)
-#define OMV_SPI_DISPLAY_RST_PIN               (&omv_pin_D12_GPIO)
-#define OMV_SPI_DISPLAY_BL_PIN                (&omv_pin_A5_GPIO)
-#define OMV_SPI_DISPLAY_TRIPLE_BUFFER         (1)
+// #define OMV_SPI_DISPLAY_RS_PIN                (&omv_pin_D13_GPIO)
+// #define OMV_SPI_DISPLAY_RST_PIN               (&omv_pin_D12_GPIO)
+// #define OMV_SPI_DISPLAY_BL_PIN                (&omv_pin_A5_GPIO)
+// #define OMV_SPI_DISPLAY_TRIPLE_BUFFER         (1)
+#define OMV_SPI_DISPLAY_CONTROLLER            (OMV_SPI6_ID)////SPI2
+#define OMV_SPI_DISPLAY_MOSI_PIN              (&omv_pin_G14_SPI6)//B15
+#define OMV_SPI_DISPLAY_MISO_PIN              (&omv_pin_G12_SPI6)//B14
+#define OMV_SPI_DISPLAY_SCLK_PIN              (&omv_pin_G13_SPI6)//B13
+#define OMV_SPI_DISPLAY_SSEL_PIN              (&omv_pin_C3_GPIO)//B12
+
+#define OMV_SPI_DISPLAY_RS_PIN                (&omv_pin_G9_GPIO)//D13
+#define OMV_SPI_DISPLAY_RST_PIN               (&omv_pin_D11_GPIO)//D12
+#define OMV_SPI_DISPLAY_BL_PIN                (&omv_pin_A1_GPIO)//A5
+#define OMV_SPI_DISPLAY_TRIPLE_BUFFER         (0)
 
 // FIR Lepton
 #define OMV_FIR_LEPTON_I2C_BUS                (OMV_FIR_I2C_ID)
