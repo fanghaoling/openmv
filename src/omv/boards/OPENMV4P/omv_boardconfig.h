@@ -271,6 +271,9 @@
 #define OMV_SPI3_DMA_RX_CHANNEL               (DMA1_Stream2)
 #define OMV_SPI3_DMA_RX_REQUEST               (DMA_REQUEST_SPI3_RX)
 
+// SPI bus 6
+// TODO: BDMA is Not currently supported by this driver.
+
 // SPI LCD Interface
 #define OMV_SPI_DISPLAY_CONTROLLER            (OMV_SPI2_ID)
 #define OMV_SPI_DISPLAY_MOSI_PIN              (&omv_pin_B15_SPI2)
