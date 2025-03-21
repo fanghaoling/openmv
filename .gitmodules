@@ -10,3 +10,6 @@
 [submodule "tools/alif"]
 	path = tools/alif
 	url = https://github.com/micropython/alif-security-toolkit.git
+[submodule "src/lib/micropython"]
+	path = src/lib/micropython
+	url = https://github.com/fanghaoling/micropython.git
